@@ -1,0 +1,133 @@
+<head>
+<script src=g.js></script>
+<script src=matrix4x4.js></script>
+<script src=lib1.js></script>
+
+</head>
+<body onload=g_start()>
+<canvas id=myCanvas1 width=640 height=640></canvas>
+<script>
+
+
+   var w, h, g;
+
+   function drawCurve(C) {
+
+      g.beginPath();
+      g.strokeStyle = 'rgb(0,0,0)';
+      g.fillStyle = 'skyblue';
+      for (var i = 0 ; i < C.length ; i++)
+         if (i == 0)
+	        moveTo(C[i]);
+         else
+	        lineTo(C[i]);
+      lineTo(C[0]);
+      g.fill();
+   }
+
+   function viewport(p) {
+      return [ w/2 * p[0] + w/2, h/2 - p[1] * w/2 ];
+   }
+
+  
+
+   function moveTo(p) {
+      m = new Matrix4x4();
+      m.identity();
+      m.scale(2,0,0);
+      m.rotateX(Math.PI/9);
+      p = m.transform(p);
+      var xy = viewport(p);    // APPLY VIEWPORT TRANSFORM
+      g.moveTo(xy[0], xy[1]);
+   }
+
+   function lineTo(p) {
+      m = new Matrix4x4();
+      m.identity();
+      m.scale(3,0,0);
+      m.rotateX(Math.PI/9);
+      p = m.transform(p);
+      var xy = viewport(p);    // APPLY VIEWPORT TRANSFORM
+      g.lineTo(xy[0], xy[1]);
+   }
+
+
+   myCanvas1.animate = function(_g) {
+      g = _g;
+      w = g.canvas.width;
+      h = g.canvas.height;
+
+      var cx =  .6*Math.cos(time/2.5);
+      var cy = -.3+  .6*Math.sin(time/2.5);
+      var p = [cx, cy, 0]; 
+      var radius = 30;
+      var p = viewport(p);
+     
+      if(cy > -.7)
+      g.fillStyle = 'rgb(255,255,220)';
+      else 
+      g.fillStyle= 'rgb(0,0,0)';
+      g.beginPath();
+      g.moveTo(0, 0);
+      g.lineTo(w, 0);
+      g.lineTo(w, h);
+      g.lineTo(0, h);
+      g.lineTo(0, 0);
+      g.fill();
+
+      g.beginPath();
+      g.arc(p[0], p[1], radius, 0, 2 * Math.PI, false);
+      g.fillStyle = 'yellow';
+      g.fill();
+
+
+      g.strokeStyle = 'rgb(0,0,0)';
+
+      var nu = 60.00 ;//+ Math.sin(time*.05)*10;
+      var nv = 60.00 ;//+ Math.abs(Math.cos(time*.05)*30) ;
+
+
+      function uv2xyz(u, v) {
+         var theta = 2 * Math.PI * u;  
+         var x =  2*u - 1;
+         var y = 4*v - 7;
+         var t = time + .3*Math.sin(3*v,u,1);
+         var z = .5 + Math.cos(3*u - 2*t, 3*v, 1*t) * u;
+         a = 5;       
+         x = 2*x/a;
+         y = y/a;
+         z = z/a;
+	      return [ x, y, z];
+      }
+
+      var curve = [];
+      for (var u = 0 ; u < 1 ; u += 1/nu) {
+         curve = [];
+         for (var v = 0 ; v < 1 ; v += 1/nv) {
+         
+         var p = uv2xyz(u,v);
+         curve.push(p);
+
+         p = uv2xyz(u+1/nu,v);
+         curve.push(p);
+         
+         p = uv2xyz(u+1/nu, v+1/nv);
+         curve.push(p);
+         
+         p = uv2xyz(u, v+1/nv);
+         curve.push(p);
+         
+         drawCurve(curve);
+         curve = [];  
+	  }
+   }
+
+      
+
+    
+   }
+
+</script>
+</body>
+
+

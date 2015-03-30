@@ -1,0 +1,224 @@
+<head>
+<script src=g.js></script>
+<script src=matrix4x4.js></script>
+<script src=lib1.js></script>
+
+</head>
+<body onload=g_start()>
+<canvas id=myCanvas1 width=640 height=640></canvas>
+
+<form name="myForm">
+<label style="position: absolute; top:10; left:700px">Start point(x,y):</label> <input style="position: absolute; top:10; left:800px;" type="text" name="input1">
+<label style="position: absolute; top:40; left:700px">End point(x,y):</label> <input style="position: absolute; top:40; left:800px" type="text" name="input2">
+<label style="position: absolute; top:70; left:700px">First Interpolation point(x,y):</label> <input style="position: absolute; top:70; left:900px" type="text" name="input3">
+<label style="position: absolute; top:100; left:700px">Second Interpolation point(x,y):</label> <input style="position: absolute; top:100; left:900px" type="text" name="input4">
+
+<button style="position: absolute; top:130; left:700px" id="okay" type="button" onclick="take_input()">Okay</button>
+<p style="display:inline; position:absolute; left:700px ; top:200px">
+Ever wondered, if sun could follow your instructions and rise according to you. Well now its possible :).
+<br>
+Default Values
+<br>
+Start position: -.6,-.6
+<br>
+End position: .6,-.6
+<br>
+First Interpolation point: -.9,.8 
+<br>
+Second Interpolation point: .8,.7
+</p>
+</form>
+
+<script>
+   var  w, h, g;
+   var linecurve = [];
+   var start_p = [.6,-.6];
+   var end_p = [-.8,-.6];
+   var start_ang = [.8,.7];
+   var end_ang = [-.9,.8];
+
+   function take_input()
+   {
+      var temp = document.forms["myForm"]["input1"].value;
+      var t = temp.split(",");
+      if(t.length>=2)
+         end_p = [parseFloat(t[0]),parseFloat(t[1])];
+
+      temp = document.forms["myForm"]["input2"].value;
+      t = temp.split(",");
+      if(t.length>=2)
+         start_p = [parseFloat(t[0]),parseFloat(t[1])];
+
+
+      temp = document.forms["myForm"]["input3"].value;
+      t = temp.split(",");
+      if(t.length>=2)
+         end_ang = [parseFloat(t[0]),parseFloat(t[1])];
+
+      temp = document.forms["myForm"]["input4"].value;
+      t = temp.split(",");
+      if(t.length>=2)
+         start_ang = [parseFloat(t[0]),parseFloat(t[1])];
+
+   }
+
+   function drawCurve(C) {
+
+      g.beginPath();
+      g.strokeStyle = 'rgb(0,0,0)';
+      g.fillStyle = 'skyblue';
+      for (var i = 0 ; i < C.length ; i++)
+         if (i == 0)
+	        moveTo(C[i]);
+         else
+	        lineTo(C[i]);
+      lineTo(C[0]);
+      g.fill();
+   }
+
+   function viewport(p) {
+      return [ w/2 * p[0] + w/2, h/2 - p[1] * w/2 ];
+   }
+
+  
+
+   function moveTo(p) {
+      m = new Matrix4x4();
+      m.identity();
+      m.scale(2,0,0);
+      m.rotateX(Math.PI/9);
+      p = m.transform(p);
+      var xy = viewport(p);    // APPLY VIEWPORT TRANSFORM
+      g.moveTo(xy[0], xy[1]);
+   }
+
+   function lineTo(p) {
+      m = new Matrix4x4();
+      m.identity();
+      m.scale(3,0,0);
+      m.rotateX(Math.PI/9);
+      p = m.transform(p);
+      var xy = viewport(p);    // APPLY VIEWPORT TRANSFORM
+      g.lineTo(xy[0], xy[1]);
+   }
+
+
+   myCanvas1.animate = function(_g) {
+      g = _g;
+      w = g.canvas.width;
+      h = g.canvas.height;
+
+
+
+      var t = Math.abs((time%10)*.9999/10.00);
+      var a = [-1*start_p[0] + 3*start_ang[0] - 3*end_ang[0] + 1*end_p[0], -1*start_p[1] + 3*start_ang[1] - 3*end_ang[1] + 1*end_p[1] ];
+	   var b = [3*start_p[0] - 6*start_ang[0] + 3*end_ang[0] + 0*end_p[0], 3*start_p[1] - 6*start_ang[1] + 3*end_ang[1] + 0*end_p[1] ];
+      var c = [-3*start_p[0] + 3*start_ang[0], -3*start_p[1] + 3*start_ang[1]];
+      var d = [start_p[0], start_p[1]];
+
+      var point_c= [a[0]*t*t*t + b[0]*t*t + c[0]*t + d[0], a[1]*t*t*t + b[1]*t*t + c[1]*t + d[1]];
+      var cx = point_c[0];
+      var cy = point_c[1];
+      var p = [cx, cy, 0]; 
+      var radius = 30;
+      var p = viewport(p);
+
+      linecurve = [];
+      for(var t=0.0;t<1.0;t += 1/50)
+      {
+
+         var point_c= [a[0]*t*t*t + b[0]*t*t + c[0]*t + d[0], a[1]*t*t*t + b[1]*t*t + c[1]*t + d[1]];
+         var cxx = point_c[0];
+         var cyy = point_c[1];
+         var temp_p = viewport([cxx,cyy]);
+         linecurve.push(temp_p);
+      }
+     
+      if(cy > -.7)
+      g.fillStyle = 'rgba(255,255,220,.5)';
+      else 
+      g.fillStyle= 'rgb(0,0,0)';
+      g.beginPath();
+      g.moveTo(0, 0);
+      g.lineTo(w, 0);
+      g.lineTo(w, h);
+      g.lineTo(0, h);
+      g.lineTo(0, 0);
+      g.fill();
+
+
+
+
+      g.beginPath();
+      g.arc(p[0], p[1], radius, 0, 2 * Math.PI, false);
+      g.fillStyle = 'yellow';
+      g.fill();
+
+
+      g.strokeStyle = 'rgb(0,0,0)';
+
+      var nu = 60.00 ;//+ Math.sin(time*.05)*10;
+      var nv = 60.00 ;//+ Math.abs(Math.cos(time*.05)*30) ;
+
+
+      function uv2xyz(u, v) {
+         var theta = 2 * Math.PI * u;  
+         var x =  2*u - 1;
+         var y = 4*v - 7;
+         var t = time + .3*Math.sin(3*v,u,1);
+         var z = .5 + Math.cos(3*u - 2*t, 3*v, 1*t) * u;
+         a = 5;       
+         x = 2*x/a;
+         y = y/a;
+         z = z/a;
+	      return [ x, y, z];
+      }
+
+      var curve = [];
+      for (var u = 0 ; u < 1 ; u += 1/nu) {
+         curve = [];
+         for (var v = 0 ; v < 1 ; v += 1/nv) {
+         
+         var p = uv2xyz(u,v);
+         curve.push(p);
+
+         p = uv2xyz(u+1/nu,v);
+         curve.push(p);
+         
+         p = uv2xyz(u+1/nu, v+1/nv);
+         curve.push(p);
+         
+         p = uv2xyz(u, v+1/nv);
+         curve.push(p);
+         
+         drawCurve(curve);
+         curve = [];  
+	  }
+   }
+
+         g.strokeStyle = 'rgb(0,0,0)';
+      g.beginPath();
+      for(var i=0;i<linecurve.length;i++)
+      {
+         if(i==0)
+            {
+               var p_t = (linecurve[i]);
+               g.moveTo(p_t[0],p_t[1]);
+            }
+         else 
+            {
+               var p_t = (linecurve[i]);
+               g.lineTo(p_t[0],p_t[1]);
+            }
+      }
+      g.stroke();
+
+      
+
+    
+   }
+
+</script>
+</body>
+
+

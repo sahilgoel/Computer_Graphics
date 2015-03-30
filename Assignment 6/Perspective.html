@@ -1,0 +1,142 @@
+
+
+<hr color=white size=75><table><tr><td width=75></td><td>
+<font face=helvetica>
+<center><big><b>
+
+Assignment 6
+
+</b></big></center>
+<hr color=white size=50>
+<!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!>
+<!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!>
+<!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!>
+
+
+
+
+<table>
+<tr>
+<td><canvas id=canvas1 width=500 height=500></td>
+<td width=50></td>
+<td>Cuboid with Perspective Transformation and varying focal length of camera
+<td width=70></td>
+</tr>
+
+</table>
+
+<script src=drawlib1.js></script>
+<script>
+   var canvas = initCanvas('canvas1');
+   canvas.update = function(g) {
+      g.strokeStyle = 'blue';
+      g.fillStyle = 'brown';
+
+      var y = (canvas.height/2-this.cursor.y)/canvas.height;
+      
+      g.beginPath();
+      g.moveTo(0,0);
+      g.lineTo(this.width,0);
+      g.lineTo(this.width,this.height);
+      g.lineTo(0,this.height);
+      g.lineTo(0,0);
+      g.stroke();
+
+      g.strokeStyle = 'black';
+      g.fillStyle = 'black';
+      g.lineCap = "round";
+      g.lineJoin = "round";
+
+      var l = .3;
+      var focal_length = .4*l + .03*Math.sin(2.*time);
+
+      vertices = [new Vector3(-l,-l,l/4), new Vector3(l,-l,l/4), new Vector3(-l,l,l/4), new Vector3(l,l,l/4), new Vector3(-l,-l,l/2), new Vector3(l,-l,l/2), new Vector3(-l,l,l/2), new Vector3(l,l,l/2)];
+
+
+      for(var i=0;i<vertices.length;i++)
+      {
+            vertices[i].x = vertices[i].x * (focal_length / vertices[i].z);
+            vertices[i].y = vertices[i].y * (focal_length / vertices[i].z);
+            vertices[i].fixview();
+      }
+
+      g.beginPath();
+      g.lineWidth = 10;
+      g.moveTo(vertices[0].x, vertices[0].y);
+      g.lineTo(vertices[1].x, vertices[1].y);
+      g.lineTo(vertices[3].x, vertices[3].y);
+      g.lineTo(vertices[2].x, vertices[2].y);
+      g.lineTo(vertices[0].x, vertices[0].y);
+      g.stroke();
+      g.fillStyle = 'salmon';
+      g.beginPath();
+      g.moveTo(vertices[0].x, vertices[0].y);
+      g.lineTo(vertices[4].x, vertices[4].y);
+      g.lineTo(vertices[5].x, vertices[5].y);
+      g.lineTo(vertices[1].x, vertices[1].y);
+      g.lineTo(vertices[0].x, vertices[0].y);
+      g.fill();
+      g.stroke();
+      g.beginPath();
+      g.fillStyle = 'yellow';
+      g.moveTo(vertices[5].x, vertices[5].y);
+      g.lineTo(vertices[7].x, vertices[7].y);
+      g.lineTo(vertices[6].x, vertices[6].y);
+      g.lineTo(vertices[4].x, vertices[4].y);
+      g.lineTo(vertices[5].x, vertices[5].y);
+      g.fill();
+      g.stroke();
+      g.beginPath();
+      g.fillStyle = 'green';
+      g.moveTo(vertices[4].x, vertices[4].y);
+      g.lineTo(vertices[6].x, vertices[6].y);
+      g.lineTo(vertices[2].x, vertices[2].y);
+      g.lineTo(vertices[0].x, vertices[0].y);
+      g.lineTo(vertices[4].x, vertices[4].y);
+      g.fill();
+      g.stroke();
+      g.beginPath();
+      g.fillStyle = 'orange';
+      g.moveTo(vertices[7].x, vertices[7].y);
+      g.lineTo(vertices[6].x, vertices[6].y);
+      g.lineTo(vertices[2].x, vertices[2].y);
+      g.lineTo(vertices[3].x, vertices[3].y);
+      g.lineTo(vertices[7].x, vertices[7].y);
+      g.fill();
+      g.stroke();
+      g.beginPath();
+      g.fillStyle = 'red';
+      g.moveTo(vertices[7].x, vertices[7].y);
+      g.lineTo(vertices[3].x, vertices[3].y);
+      g.lineTo(vertices[1].x, vertices[1].y);
+      g.lineTo(vertices[5].x, vertices[5].y);
+      g.lineTo(vertices[7].x, vertices[7].y);
+      g.fill();
+      
+      
+      g.stroke();
+      
+      
+      
+      g.stroke();
+
+   }
+
+
+
+</script>
+
+
+
+
+<p>&nbsp;<p><hr>&nbsp;<p>
+
+
+
+
+<!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!>
+<!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!>
+<!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!>
+<hr color=white size=1000>
+</font>
+</td><td width=75>&nbsp;</td></tr></table>

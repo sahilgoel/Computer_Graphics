@@ -1,0 +1,1063 @@
+
+
+<hr color=white size=75><table><tr><td width=75></td><td>
+<font face=helvetica>
+<center><big><b>
+
+Assignment 5(Viewpoint Transformation is used in every canvas)
+
+</b></big></center>
+<hr color=white size=50>
+<!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!>
+<!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!>
+<!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!>
+
+
+
+
+<table>
+<tr>
+<td><canvas id=canvas1 width=500 height=500></td>
+<td width=50></td>
+<td>Sponge Bob: Here, I have used translation matrix to draw mutliple faces at different centers.
+<td width=70></td>
+</tr>
+
+<tr>
+<td><canvas id=canvas2 width=500 height=500></td>
+<td width=50></td>
+<td> Rotating Fan(along z): Here, I have used rotation matrix for drawing different blades rotated at an angle of 120 degrees and for rotating the blades. Change your mouse y coordinate and keep it still for a second.</td>
+</tr>
+
+<tr>
+<td><canvas id=canvas3 width=500 height=500></td>
+<td width=50></td>
+<td> Moving Hand(Rotation along x,y,z). First Hand to Second Hand (Rotation along z)
+First Hand Rotation (Along x).
+Second Hand Rotation (Along y).
+</td>
+</tr>
+
+<tr>
+<td><canvas id=canvas4 width=500 height=500></td>
+<td width=50></td>
+<td> Scaling of shadow as box comes closer to it.
+</td>
+</tr>
+
+</table>
+
+<script src=drawlib1.js></script>
+<script>
+   var canvas = initCanvas('canvas1');
+   canvas.update = function(g) {
+      //Face boundary
+      var vertices = [new Vector3(-.3,.3,0), new Vector3(.3,.3,0), new Vector3(-.3,.9,0), new Vector3(.3,.9,0)];
+      var t_m = [[1,0,0,0], [0,1,0,.5], [0,0,1,.3]];
+      
+      vertices[0].fixview();
+      vertices[1].fixview();
+      vertices[2].fixview();
+      vertices[3].fixview();
+    
+      g.fillStyle = 'Yellow';
+      g.beginPath();
+      g.moveTo(vertices[0].x, vertices[0].y);
+      g.lineTo(vertices[1].x, vertices[1].y);
+      g.lineTo(vertices[3].x, vertices[3].y);
+      g.lineTo(vertices[2].x, vertices[2].y);
+      g.fill();
+      ///////////////////////////////// EYES
+      g.fillStyle = 'white';
+      var e1 = new Vector3(-0.11,0.70,0);
+      var e2 = new Vector3(.11, .70, 0);
+      e1.fixview();
+      e2.fixview();      
+      g.beginPath();
+      g.arc(e1.x,e1.y,35,0,2*Math.PI);
+      g.fill();
+      g.beginPath();
+      g.arc(e2.x,e2.y,35,0,2*Math.PI);
+      g.fill();
+
+      g.fillStyle = 'DeepSkyBlue';
+      var e11 = new Vector3(-0.10, .71,0);
+      var e12 = new Vector3(.10, .71, 0);
+      e11.fixview();
+      e12.fixview();
+      g.beginPath();
+      g.arc(e11.x,e11.y,25,0,2*Math.PI);
+      g.fill();
+      g.beginPath();
+      g.arc(e12.x,e12.y,25,0,2*Math.PI);
+      g.fill();
+
+      g.fillStyle = 'Black';
+      var e21 = new Vector3(-.09,.72,0);
+      var e22 = new Vector3(.09,.72,0);
+      e21.fixview();
+      e22.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,20,0,2*Math.PI);
+      g.fill();
+      g.beginPath();
+      g.arc(e22.x,e22.y,20,0,2*Math.PI);
+      g.fill();
+
+      g.fillStyle = 'White';
+      e21 = new Vector3(-.1,.76,0);
+      e22 = new Vector3(.1,.76,0);
+      e21.fixview();
+      e22.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,5,0,2*Math.PI);
+      g.fill();
+      g.beginPath();
+      g.arc(e22.x,e22.y,5,0,2*Math.PI);
+      g.fill();
+
+      e21 = new Vector3(-.13,.69,0);
+      e22 = new Vector3(.13,.69,0);
+      e21.fixview();
+      e22.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,5,0,2*Math.PI);
+      g.fill();
+      g.beginPath();
+      g.arc(e22.x,e22.y,5,0,2*Math.PI);
+      g.fill();
+      
+      
+      g.strokeStyle = 'black';
+      e21 = new Vector3(0.,.7,0);
+      e21.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,70,.2*Math.PI,.8*Math.PI);
+      g.stroke();
+
+
+      g.fillStyle = 'LightGreen';
+      e21 = new Vector3(-.24,.82,0);
+      e21.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,8,0,2*Math.PI);
+      g.fill();
+
+      e21 = new Vector3(-.18,.87,0);
+      e21.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,4,0,2*Math.PI);
+      g.fill();
+
+      e21 = new Vector3(.24,.82,0);
+      e21.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,8,0,2*Math.PI);
+      g.fill();
+
+      e21 = new Vector3(.18,.87,0);
+      e21.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,4,0,2*Math.PI);
+      g.fill();
+      
+
+      e21 = new Vector3(-.24,.42,0);
+      e21.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,8,0,2*Math.PI);
+      g.fill();
+
+      e21 = new Vector3(-.18,.37,0);
+      e21.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,4,0,2*Math.PI);
+      g.fill();
+      
+
+      e21 = new Vector3(.24,.42,0);
+      e21.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,8,0,2*Math.PI);
+      g.fill();
+
+      e21 = new Vector3(.18,.37,0);
+      e21.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,4,0,2*Math.PI);
+      g.fill();
+      
+
+      g.fillStyle = 'White';
+      var rect = new Vector3(-.06,.44,0);
+      rect.fixview();
+      g.beginPath();
+      g.fillRect(rect.x,rect.y, 10,20);
+
+
+      g.fillStyle = 'White';
+      var rect = new Vector3(.0,.44,0);
+      rect.fixview();
+      g.beginPath();
+      g.fillRect(rect.x,rect.y, 10,20);
+
+      g.strokeStyle ='black';
+      var l = new Vector3(-.25, .52,0);
+      l.fixview();
+      g.beginPath();
+      g.moveTo(l.x,l.y);
+      g.lineTo(l.x + 10, l.y - 10);
+      g.stroke();
+
+      l = new Vector3(.25, .52,0);
+      l.fixview();
+      g.beginPath();
+      g.moveTo(l.x,l.y);
+      g.lineTo(l.x - 10, l.y - 10);
+      g.stroke();
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+      vertices = [new Vector3(-.3,.3,0), new Vector3(.3,.3,0), new Vector3(-.3,.9,0), new Vector3(.3,.9,0)];
+      var t_m = [[1,0,0,-.5], [0,1,0,-1.], [0,0,1,0]];
+      
+      vertices[0].translate(t_m);
+      vertices[1].translate(t_m);
+      vertices[2].translate(t_m);
+      vertices[3].translate(t_m);
+      vertices[0].fixview();
+      vertices[1].fixview();
+      vertices[2].fixview();
+      vertices[3].fixview();
+
+    
+      g.fillStyle = 'Yellow';
+      g.beginPath();
+      g.moveTo(vertices[0].x, vertices[0].y);
+      g.lineTo(vertices[1].x, vertices[1].y);
+      g.lineTo(vertices[3].x, vertices[3].y);
+      g.lineTo(vertices[2].x, vertices[2].y);
+      g.fill();
+
+       ///////////////////////////////// EYES
+      g.fillStyle = 'white';
+      var e1 = new Vector3(-0.11,0.70,0);
+      var e2 = new Vector3(.11, .70, 0);
+      e1.translate(t_m);
+      e2.translate(t_m);
+      e1.fixview();
+      e2.fixview();      
+      g.beginPath();
+      g.arc(e1.x,e1.y,35,0,2*Math.PI);
+      g.fill();
+      g.beginPath();
+      g.arc(e2.x,e2.y,35,0,2*Math.PI);
+      g.fill();
+
+      g.fillStyle = 'DeepSkyBlue';
+      var e11 = new Vector3(-0.10, .71,0);
+      var e12 = new Vector3(.10, .71, 0);
+      e11.translate(t_m);
+      e12.translate(t_m);
+      e11.fixview();
+      e12.fixview();
+      g.beginPath();
+      g.arc(e11.x,e11.y,25,0,2*Math.PI);
+      g.fill();
+      g.beginPath();
+      g.arc(e12.x,e12.y,25,0,2*Math.PI);
+      g.fill();
+
+      g.fillStyle = 'Black';
+      var e21 = new Vector3(-.09,.72,0);
+      var e22 = new Vector3(.09,.72,0);
+      e21.translate(t_m);
+      e22.translate(t_m);
+      e21.fixview();
+      e22.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,20,0,2*Math.PI);
+      g.fill();
+      g.beginPath();
+      g.arc(e22.x,e22.y,20,0,2*Math.PI);
+      g.fill();
+
+      g.fillStyle = 'White';
+      e21 = new Vector3(-.1,.76,0);
+      e22 = new Vector3(.1,.76,0);
+      e21.translate(t_m);
+      e22.translate(t_m);
+      e21.fixview();
+      e22.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,5,0,2*Math.PI);
+      g.fill();
+      g.beginPath();
+      g.arc(e22.x,e22.y,5,0,2*Math.PI);
+      g.fill();
+
+      e21 = new Vector3(-.13,.69,0);
+      e22 = new Vector3(.13,.69,0);
+      e21.translate(t_m);
+      e22.translate(t_m);
+      e21.fixview();
+      e22.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,5,0,2*Math.PI);
+      g.fill();
+      g.beginPath();
+      g.arc(e22.x,e22.y,5,0,2*Math.PI);
+      g.fill();
+      
+      
+      g.strokeStyle = 'black';
+      e21 = new Vector3(0.,.7,0);
+      e21.translate(t_m);
+      e21.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,70,.2*Math.PI,.8*Math.PI);
+      g.stroke();
+
+
+
+      g.fillStyle = 'LightGreen';
+      e21 = new Vector3(-.24,.82,0);
+      e21.translate(t_m);
+      e21.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,8,0,2*Math.PI);
+      g.fill();
+
+      e21 = new Vector3(-.18,.87,0);
+      e21.translate(t_m);
+      e21.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,4,0,2*Math.PI);
+      g.fill();
+
+      e21 = new Vector3(.24,.82,0);
+      e21.translate(t_m);
+      e21.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,8,0,2*Math.PI);
+      g.fill();
+
+      e21 = new Vector3(.18,.87,0);
+      e21.translate(t_m);
+      e21.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,4,0,2*Math.PI);
+      g.fill();
+      
+
+      e21 = new Vector3(-.24,.42,0);
+      e21.translate(t_m);
+      e21.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,8,0,2*Math.PI);
+      g.fill();
+
+      e21 = new Vector3(-.18,.37,0);
+      e21.translate(t_m);
+      e21.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,4,0,2*Math.PI);
+      g.fill();
+      
+
+      e21 = new Vector3(.24,.42,0);
+      e21.translate(t_m);
+      e21.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,8,0,2*Math.PI);
+      g.fill();
+
+      e21 = new Vector3(.18,.37,0);
+      e21.translate(t_m);
+      e21.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,4,0,2*Math.PI);
+      g.fill();
+      
+
+      g.fillStyle = 'White';
+      var rect = new Vector3(-.06,.44,0);
+      rect.translate(t_m);
+      rect.fixview();
+      g.beginPath();
+      g.fillRect(rect.x,rect.y, 10,20);
+
+
+      g.fillStyle = 'White';
+      var rect = new Vector3(.0,.44,0);
+      rect.translate(t_m);
+      rect.fixview();
+      g.beginPath();
+      g.fillRect(rect.x,rect.y, 10,20);
+
+      g.strokeStyle ='black';
+      var l = new Vector3(-.25, .52,0);
+      l.translate(t_m);
+      l.fixview();
+      g.beginPath();
+      g.moveTo(l.x,l.y);
+      g.lineTo(l.x + 10, l.y - 10);
+      g.stroke();
+
+      l = new Vector3(.25, .52,0);
+      l.translate(t_m);
+      l.fixview();
+      g.beginPath();
+      g.moveTo(l.x,l.y);
+      g.lineTo(l.x - 10, l.y - 10);
+      g.stroke();
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+      
+   
+      vertices = [new Vector3(-.3,.3,0), new Vector3(.3,.3,0), new Vector3(-.3,.9,0), new Vector3(.3,.9,0)];
+      var t_m = [[1,0,0,.5], [0,1,0,-1.], [0,0,1,0]];
+      
+      vertices[0].translate(t_m);
+      vertices[1].translate(t_m);
+      vertices[2].translate(t_m);
+      vertices[3].translate(t_m);
+      vertices[0].fixview();
+      vertices[1].fixview();
+      vertices[2].fixview();
+      vertices[3].fixview();
+
+    
+      g.fillStyle = 'Yellow';
+      g.beginPath();
+      g.moveTo(vertices[0].x, vertices[0].y);
+      g.lineTo(vertices[1].x, vertices[1].y);
+      g.lineTo(vertices[3].x, vertices[3].y);
+      g.lineTo(vertices[2].x, vertices[2].y);
+      g.fill();
+
+       ///////////////////////////////// EYES
+      g.fillStyle = 'white';
+      var e1 = new Vector3(-0.11,0.70,0);
+      var e2 = new Vector3(.11, .70, 0);
+      e1.translate(t_m);
+      e2.translate(t_m);
+      e1.fixview();
+      e2.fixview();      
+      g.beginPath();
+      g.arc(e1.x,e1.y,35,0,2*Math.PI);
+      g.fill();
+      g.beginPath();
+      g.arc(e2.x,e2.y,35,0,2*Math.PI);
+      g.fill();
+
+      g.fillStyle = 'DeepSkyBlue';
+      var e11 = new Vector3(-0.10, .71,0);
+      var e12 = new Vector3(.10, .71, 0);
+      e11.translate(t_m);
+      e12.translate(t_m);
+      e11.fixview();
+      e12.fixview();
+      g.beginPath();
+      g.arc(e11.x,e11.y,25,0,2*Math.PI);
+      g.fill();
+      g.beginPath();
+      g.arc(e12.x,e12.y,25,0,2*Math.PI);
+      g.fill();
+
+      g.fillStyle = 'Black';
+      var e21 = new Vector3(-.09,.72,0);
+      var e22 = new Vector3(.09,.72,0);
+      e21.translate(t_m);
+      e22.translate(t_m);
+      e21.fixview();
+      e22.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,20,0,2*Math.PI);
+      g.fill();
+      g.beginPath();
+      g.arc(e22.x,e22.y,20,0,2*Math.PI);
+      g.fill();
+
+      g.fillStyle = 'White';
+      e21 = new Vector3(-.1,.76,0);
+      e22 = new Vector3(.1,.76,0);
+      e21.translate(t_m);
+      e22.translate(t_m);
+      e21.fixview();
+      e22.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,5,0,2*Math.PI);
+      g.fill();
+      g.beginPath();
+      g.arc(e22.x,e22.y,5,0,2*Math.PI);
+      g.fill();
+
+      e21 = new Vector3(-.13,.69,0);
+      e22 = new Vector3(.13,.69,0);
+      e21.translate(t_m);
+      e22.translate(t_m);
+      e21.fixview();
+      e22.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,5,0,2*Math.PI);
+      g.fill();
+      g.beginPath();
+      g.arc(e22.x,e22.y,5,0,2*Math.PI);
+      g.fill();
+      
+      
+      g.strokeStyle = 'black';
+      e21 = new Vector3(0.,.7,0);
+      e21.translate(t_m);
+      e21.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,70,.2*Math.PI,.8*Math.PI);
+      g.stroke();
+
+
+
+      g.fillStyle = 'LightGreen';
+      e21 = new Vector3(-.24,.82,0);
+      e21.translate(t_m);
+      e21.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,8,0,2*Math.PI);
+      g.fill();
+
+      e21 = new Vector3(-.18,.87,0);
+      e21.translate(t_m);
+      e21.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,4,0,2*Math.PI);
+      g.fill();
+
+      e21 = new Vector3(.24,.82,0);
+      e21.translate(t_m);
+      e21.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,8,0,2*Math.PI);
+      g.fill();
+
+      e21 = new Vector3(.18,.87,0);
+      e21.translate(t_m);
+      e21.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,4,0,2*Math.PI);
+      g.fill();
+      
+
+      e21 = new Vector3(-.24,.42,0);
+      e21.translate(t_m);
+      e21.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,8,0,2*Math.PI);
+      g.fill();
+
+      e21 = new Vector3(-.18,.37,0);
+      e21.translate(t_m);
+      e21.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,4,0,2*Math.PI);
+      g.fill();
+      
+
+      e21 = new Vector3(.24,.42,0);
+      e21.translate(t_m);
+      e21.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,8,0,2*Math.PI);
+      g.fill();
+
+      e21 = new Vector3(.18,.37,0);
+      e21.translate(t_m);
+      e21.fixview();
+      g.beginPath();
+      g.arc(e21.x,e21.y,4,0,2*Math.PI);
+      g.fill();
+      
+
+      g.fillStyle = 'White';
+      var rect = new Vector3(-.06,.44,0);
+      rect.translate(t_m);
+      rect.fixview();
+      g.beginPath();
+      g.fillRect(rect.x,rect.y, 10,20);
+
+
+      g.fillStyle = 'White';
+      var rect = new Vector3(.0,.44,0);
+      rect.translate(t_m);
+      rect.fixview();
+      g.beginPath();
+      g.fillRect(rect.x,rect.y, 10,20);
+
+      g.strokeStyle ='black';
+      var l = new Vector3(-.25, .52,0);
+      l.translate(t_m);
+      l.fixview();
+      g.beginPath();
+      g.moveTo(l.x,l.y);
+      g.lineTo(l.x + 10, l.y - 10);
+      g.stroke();
+
+      l = new Vector3(.25, .52,0);
+      l.translate(t_m);
+      l.fixview();
+      g.beginPath();
+      g.moveTo(l.x,l.y);
+      g.lineTo(l.x - 10, l.y - 10);
+      g.stroke();
+
+      //////////////////////////////
+      g.strokeStyle = 'blue';
+      g.beginPath();
+      g.moveTo(0,0);
+      g.lineTo(this.width,0);
+      g.lineTo(this.width,this.height);
+      g.lineTo(0,this.height);
+      g.lineTo(0,0);
+      g.stroke();
+   }
+
+   var canvas = initCanvas('canvas2');
+   canvas.update = function(g) {
+      g.strokeStyle = 'blue';
+      g.fillStyle = 'brown';
+
+      var y = (canvas.height/2-this.cursor.y)/canvas.height;
+      /*if(y<0.)
+         y=0.;*/
+
+      g.beginPath();
+      g.moveTo(0,0);
+      g.lineTo(this.width,0);
+      g.lineTo(this.width,this.height);
+      g.lineTo(0,this.height);
+      g.lineTo(0,0);
+      g.stroke();
+
+      g.strokeStyle = 'black';
+      g.fillStyle = 'black';
+      var fan_c = new Vector3(0.,0.,0.);
+      fan_c.fixview();
+      g.beginPath();
+      g.arc(fan_c.x,fan_c.y,20,0,2*Math.PI);
+      g.fill();
+
+       g.fillStyle = 'brown';
+      var blade1 = [new Vector3(-0.05,.08,0), new Vector3(.05,.08,0), new Vector3(-.05,.5,0), new Vector3(.05,.5,0)];
+      var rot60 = [[Math.cos(4*time*4*y),-Math.sin(4*time*4*y),0,0], [Math.sin(4*time*4*y),Math.cos(4*time*4*y),0,0], [0,0,1,0], [0,0,0,1]];
+      
+      blade1[0].rotate(rot60);
+      blade1[1].rotate(rot60);
+      blade1[2].rotate(rot60);
+      blade1[3].rotate(rot60);
+      for(var i=0;i<4;i++)
+         blade1[i].fixview();
+
+
+      g.beginPath();
+      g.moveTo(blade1[0].x, blade1[0].y);
+      g.lineTo(blade1[1].x, blade1[1].y);
+      g.lineTo(blade1[3].x, blade1[3].y);
+      g.lineTo(blade1[2].x, blade1[2].y);
+      g.lineTo(blade1[0].x, blade1[0].y);
+      g.fill();
+
+
+      var rot60 = [[Math.cos(Math.PI*2/3 + (4*time*4*y)),-Math.sin(Math.PI*2/3 + (4*time*4*y)),0,0], [Math.sin(Math.PI*2/3+(4*time*4*y)),Math.cos(Math.PI*2/3 + (4*time*4*y)),0,0], [0,0,1,0], [0,0,0,1]];
+      blade1 = [new Vector3(-0.05,.08,0), new Vector3(.05,.08,0), new Vector3(-.05,.5,0), new Vector3(.05,.5,0)];
+      
+      blade1[0].rotate(rot60);
+      blade1[1].rotate(rot60);
+      blade1[2].rotate(rot60);
+      blade1[3].rotate(rot60);
+      for(var i=0;i<4;i++)
+         blade1[i].fixview();
+      
+      g.beginPath(); 
+      g.moveTo(blade1[0].x, blade1[0].y);
+      g.lineTo(blade1[1].x, blade1[1].y);
+      g.lineTo(blade1[3].x, blade1[3].y);
+      g.lineTo(blade1[2].x, blade1[2].y);
+      g.lineTo(blade1[0].x, blade1[0].y);
+      g.fill();
+
+
+      var rot60 = [[Math.cos(4*Math.PI/3 + 4*time*4*y),-Math.sin(4*Math.PI/3 + 4*time*4*y),0,0], [Math.sin(4*Math.PI/3 + 4*time*4*y),Math.cos(4*Math.PI/3 + 4*time*4*y),0,0], [0,0,1,0], [0,0,0,1]];
+      blade1 = [new Vector3(-0.05,.08,0), new Vector3(.05,.08,0), new Vector3(-.05,.5,0), new Vector3(.05,.5,0)];
+      
+      blade1[0].rotate(rot60);
+      blade1[1].rotate(rot60);
+      blade1[2].rotate(rot60);
+      blade1[3].rotate(rot60);
+      for(var i=0;i<4;i++)
+         blade1[i].fixview();
+      
+      g.beginPath(); 
+      g.moveTo(blade1[0].x, blade1[0].y);
+      g.lineTo(blade1[1].x, blade1[1].y);
+      g.lineTo(blade1[3].x, blade1[3].y);
+      g.lineTo(blade1[2].x, blade1[2].y);
+      g.lineTo(blade1[0].x, blade1[0].y);
+      g.fill();
+
+   }
+
+
+
+
+   var canvas = initCanvas('canvas3');
+   canvas.update = function(g) {
+   g.strokeStyle = 'blue';
+      g.fillStyle = 'salmon';
+
+      var y = (canvas.height/2-this.cursor.y)/canvas.height;
+   
+      g.beginPath();
+      g.moveTo(0,0);
+      g.lineTo(this.width,0);
+      g.lineTo(this.width,this.height);
+      g.lineTo(0,this.height);
+      g.lineTo(0,0);
+      g.stroke();
+
+      
+      var p1 = new Vector3(-.2,0,0);
+      var p2 = new Vector3(-.2,.4,0);
+      var p3 = new Vector3(-.25,.45,0);
+      var p4 = new Vector3(-.24,.46,0);
+      var p5 = new Vector3(-.18,.41,0);
+      var p6 = new Vector3(-.18,.5,0);
+      var p7 = new Vector3(-.16,.5,0);
+      var p8 = new Vector3(-.16,.41,0);
+      var p9 = new Vector3(-.15,.41,0);
+      var p10 = new Vector3(-.15,.51,0);
+      var p11 = new Vector3(-.13,.51,0);
+      var p12 = new Vector3(-.13,.41,0);
+      var p13 = new Vector3(-.12,.41,0);
+      var p14 = new Vector3(-.12,.505,0);
+      var p15 = new Vector3(-.10,.505,0);
+      var p16 = new Vector3(-.10,.41,0);
+      var p17 = new Vector3(-.09,.41,0);
+      var p18 = new Vector3(-.09,.48,0);
+      var p19 = new Vector3(-.07,.48,0);
+      var p20 = new Vector3(-.07,0,0);
+      
+      
+      var rot_x = [[1,0,0,0],[0,Math.abs(Math.cos(3*time)), -Math.abs(Math.sin(3*time)),0],[0,Math.abs(Math.sin(3*time)), Math.abs(Math.cos(3*time)),0], [0,0,0,1]];
+      g.beginPath();
+      p1.rotate(rot_x);
+      p2.rotate(rot_x);
+      p3.rotate(rot_x);
+      p4.rotate(rot_x);
+      p5.rotate(rot_x);
+      p6.rotate(rot_x);
+      p7.rotate(rot_x);
+      p8.rotate(rot_x);
+      p9.rotate(rot_x);
+      p10.rotate(rot_x);
+      p11.rotate(rot_x);
+      p12.rotate(rot_x);
+      p13.rotate(rot_x);
+      p14.rotate(rot_x);
+      p15.rotate(rot_x);
+      p16.rotate(rot_x);
+      p17.rotate(rot_x);
+      p18.rotate(rot_x);
+      p19.rotate(rot_x);
+      p20.rotate(rot_x);
+      
+
+      
+      
+      
+      p1.fixview();
+      p2.fixview();
+      p3.fixview();
+      p4.fixview();
+      p5.fixview();
+      p6.fixview();
+      p7.fixview();
+      p8.fixview();
+      p9.fixview();
+      p10.fixview();
+      p11.fixview();
+      p12.fixview();
+      p13.fixview();
+      p14.fixview();
+      p15.fixview();
+      p16.fixview();
+      p17.fixview();
+      p18.fixview();
+      p19.fixview();
+      p20.fixview();
+      
+      
+      
+      g.moveTo(p1.x, p1.y);
+      g.lineTo(p2.x, p2.y);
+      g.lineTo(p3.x, p3.y);
+      g.lineTo(p4.x, p4.y);
+      g.lineTo(p5.x, p5.y);
+      g.lineTo(p6.x, p6.y);
+      g.lineTo(p7.x, p7.y);
+      g.lineTo(p8.x, p8.y);
+      g.lineTo(p9.x, p9.y);
+      g.lineTo(p10.x, p10.y);
+      g.lineTo(p11.x, p11.y);
+      g.lineTo(p12.x, p12.y);
+      g.lineTo(p13.x, p13.y);
+      g.lineTo(p14.x, p14.y);
+      g.lineTo(p15.x, p15.y);
+      g.lineTo(p16.x, p16.y);
+      g.lineTo(p17.x, p17.y);
+      g.lineTo(p18.x, p18.y);
+      g.lineTo(p19.x, p19.y);
+      g.lineTo(p20.x, p20.y);
+      g.fill();
+      
+      /////////////////////////////////////////////////////////////////
+      var p1 = new Vector3(-.2,0,0);
+      var p2 = new Vector3(-.2,.4,0);
+      var p3 = new Vector3(-.25,.45,0);
+      var p4 = new Vector3(-.24,.46,0);
+      var p5 = new Vector3(-.18,.41,0);
+      var p6 = new Vector3(-.18,.5,0);
+      var p7 = new Vector3(-.16,.5,0);
+      var p8 = new Vector3(-.16,.41,0);
+      var p9 = new Vector3(-.15,.41,0);
+      var p10 = new Vector3(-.15,.51,0);
+      var p11 = new Vector3(-.13,.51,0);
+      var p12 = new Vector3(-.13,.41,0);
+      var p13 = new Vector3(-.12,.41,0);
+      var p14 = new Vector3(-.12,.505,0);
+      var p15 = new Vector3(-.10,.505,0);
+      var p16 = new Vector3(-.10,.41,0);
+      var p17 = new Vector3(-.09,.41,0);
+      var p18 = new Vector3(-.09,.48,0);
+      var p19 = new Vector3(-.07,.48,0);
+      var p20 = new Vector3(-.07,0,0);
+
+
+      var rot90 = rotateZ(3*Math.PI/2);
+      var rot_x = rotateY(Math.abs(time));
+      var trans = translate(.2,-.2,0);
+
+      p1.rotate(rot90);
+      p1.rotate(rot_x);
+      p1.translate(trans);
+
+      p2.rotate(rot90);
+      p2.rotate(rot_x);
+      p2.translate(trans);
+      
+      p3.rotate(rot90);
+      p3.rotate(rot_x);
+      p3.translate(trans);
+      
+      p4.rotate(rot90);
+      p4.rotate(rot_x);
+      p4.translate(trans);
+      
+      p5.rotate(rot90);
+      p5.rotate(rot_x);
+      p5.translate(trans);
+      
+      p6.rotate(rot90);
+      p6.rotate(rot_x);
+      p6.translate(trans);
+      
+      p7.rotate(rot90);
+      p7.rotate(rot_x);
+      p7.translate(trans);
+      
+      p8.rotate(rot90);
+      p8.rotate(rot_x);
+      p8.translate(trans);
+      
+      p9.rotate(rot90);
+      p9.rotate(rot_x);
+      p9.translate(trans);
+      
+      p10.rotate(rot90);
+      p10.rotate(rot_x);
+      p10.translate(trans);
+      
+      p11.rotate(rot90);
+      p11.rotate(rot_x);
+      p11.translate(trans);
+      
+      p12.rotate(rot90);
+      p12.rotate(rot_x);
+      p12.translate(trans);
+      
+      p13.rotate(rot90);
+      p13.rotate(rot_x);
+      p13.translate(trans);
+      
+      p14.rotate(rot90);
+      p14.rotate(rot_x);
+      p14.translate(trans);
+      
+      p15.rotate(rot90);
+      p15.rotate(rot_x);
+      p15.translate(trans);
+      
+      p16.rotate(rot90);
+      p16.rotate(rot_x);
+      p16.translate(trans);
+      
+      p17.rotate(rot90);
+      p17.rotate(rot_x);
+      p17.translate(trans);
+      
+      p18.rotate(rot90);
+      p18.rotate(rot_x);
+      p18.translate(trans);
+      
+      p19.rotate(rot90);
+      p19.rotate(rot_x);
+      p19.translate(trans);
+      
+      p20.rotate(rot90);
+      p20.rotate(rot_x);
+      p20.translate(trans);
+      
+      
+
+      
+      p1.fixview();
+      p2.fixview();
+      p3.fixview();
+      p4.fixview();
+      p5.fixview();
+      p6.fixview();
+      p7.fixview();
+      p8.fixview();
+      p9.fixview();
+      p10.fixview();
+      p11.fixview();
+      p12.fixview();
+      p13.fixview();
+      p14.fixview();
+      p15.fixview();
+      p16.fixview();
+      p17.fixview();
+      p18.fixview();
+      p19.fixview();
+      p20.fixview();
+      
+      
+      
+      g.moveTo(p1.x, p1.y);
+      g.lineTo(p2.x, p2.y);
+      g.lineTo(p3.x, p3.y);
+      g.lineTo(p4.x, p4.y);
+      g.lineTo(p5.x, p5.y);
+      g.lineTo(p6.x, p6.y);
+      g.lineTo(p7.x, p7.y);
+      g.lineTo(p8.x, p8.y);
+      g.lineTo(p9.x, p9.y);
+      g.lineTo(p10.x, p10.y);
+      g.lineTo(p11.x, p11.y);
+      g.lineTo(p12.x, p12.y);
+      g.lineTo(p13.x, p13.y);
+      g.lineTo(p14.x, p14.y);
+      g.lineTo(p15.x, p15.y);
+      g.lineTo(p16.x, p16.y);
+      g.lineTo(p17.x, p17.y);
+      g.lineTo(p18.x, p18.y);
+      g.lineTo(p19.x, p19.y);
+      g.lineTo(p20.x, p20.y);
+      g.fill();
+      
+      g.stroke();
+
+
+
+   }
+
+
+   var canvas = initCanvas('canvas4');
+   canvas.update = function(g) {
+
+      g.strokeStyle = 'blue';
+      g.fillStyle = 'LightGreen';
+      var y = (canvas.height/2-this.cursor.y)/canvas.height;
+   
+      g.beginPath();
+      g.moveTo(0,0);
+      g.lineTo(this.width,0);
+      g.lineTo(this.width,this.height);
+      g.lineTo(0,this.height);
+      g.lineTo(0,0);
+      g.stroke();
+
+      g.strokeStyle = 'black';
+      var v = [new Vector3(-.2,-.2,0), new Vector3(.2,-.2,0), new Vector3(-.2,.2,0), new Vector3(.2,.2,0)];
+      var trans = [[1,0,0,0],[0,1,0,-.3*Math.sin(time)], [0,0,1,0],[0,0,0,1]];
+
+      v[0].translate(trans);
+      v[1].translate(trans);
+      v[2].translate(trans);
+      v[3].translate(trans);
+      
+
+
+      var t = v[0].y;
+      v[0].fixview();
+      v[1].fixview();
+      v[2].fixview();
+      v[3].fixview();
+
+      
+      g.beginPath();
+      g.moveTo(v[0].x,v[0].y);
+      g.lineTo(v[1].x,v[1].y);
+      g.lineTo(v[3].x,v[3].y);
+      g.lineTo(v[2].x,v[2].y);
+      g.fill();
+      
+      var v = [new Vector3(-.2,-.8,0),new Vector3(.2,-.8,0),new Vector3(-.2,-.9,0),new Vector3(.2,-.9,0)];
+      var sc = scale(2*(1-Math.abs((v[0].y - t))),1,1);
+
+      v[0].scale(sc);
+      v[1].scale(sc);
+      v[2].scale(sc);
+      v[3].scale(sc);
+      
+      v[0].fixview();
+      v[1].fixview();
+      v[2].fixview();
+      v[3].fixview();
+
+      g.fillStyle ='black';
+      g.beginPath();
+      g.moveTo(v[0].x,v[0].y);
+      g.lineTo(v[1].x,v[1].y);
+      g.lineTo(v[3].x,v[3].y);
+      g.lineTo(v[2].x,v[2].y);
+      g.fill();
+
+      var m = new Matrix(3,3);
+      
+   }
+</script>
+
+
+
+
+<p>&nbsp;<p><hr>&nbsp;<p>
+
+
+
+
+<!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!>
+<!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!>
+<!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!>
+<hr color=white size=1000>
+</font>
+</td><td width=75>&nbsp;</td></tr></table>

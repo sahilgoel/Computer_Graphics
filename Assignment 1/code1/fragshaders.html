@@ -1,0 +1,495 @@
+<script src=lib1.js></script>
+
+<canvas id='canvas1' width='640' height='640'></canvas>
+
+<script id='my_vertex_shader' type='x-shader/x-vertex'>
+   attribute vec3 aPosition;
+   varying   vec3 vPosition;
+   void main() {
+      gl_Position = vec4(aPosition, 1.0);
+      vPosition = aPosition;
+   }
+</script>
+
+<!!==========================================================================
+
+   Below is the fragment shader from class (with some slight improvements).
+
+   Your assignment is to write your own interesting fragment shader program.
+   Try to have fun with it -- use "uTime" to create animated patterns, and
+   "uCursor" to make it responsive to a user's mouse gestures.
+
+   Try to make something as completely different from my "easter egg" example
+   as possible :-)
+
+============================================================================>
+
+<script id='my_fragment_shader' type='x-shader/x-fragment'>
+   precision mediump float;
+   uniform float uTime;
+   uniform vec3  uCursor;
+   varying vec3  vPosition;
+   void main() {
+      vec3 color = vec3(0., 0., 0.);                    // Set background color black.
+      float x = vPosition.x;                            // Use only x and y coords of
+      float y = vPosition.y;           
+      float t=0.;                 //   the square's geometry.
+      float rr = (x * x + y * y) / pow(.5, 2.);         // Compute radius squared.
+      float z = ((x*x + y*y -.1)*(x*x + y*y -.1)*(x*x + y*y -.1) - (x*x*y*y*y));
+      float b=0.,g=0.;
+      y=y+.1;
+      if(uCursor.z==0.)
+      {
+         float x_0=.1*abs(sin(3.*uTime));
+         float y_0=.1*abs(sin(3.*uTime));
+         
+         x=x-x_0 - uCursor.x;
+         y=y-y_0 - uCursor.y;
+         float th=abs(sin(3.*uTime))* abs(uCursor.z-1.) * .15 + .06;
+         if(th<.05) th=.05;
+         if(((x*x + y*y -th)*(x*x + y*y -th)*(x*x + y*y -th) - (x*x*y*y*y)) < 0.)
+         {
+               t=x+y+.3;
+               if(t<.2)
+                  t=.2;
+               t = .2 + t*.6;
+               if(t>.8)
+                  t=.8;
+                b=.1;
+               g=.1;
+         }
+         else
+         {
+            t=0.0;
+            g=0.0;
+            b=0.0;
+         }
+      }
+      else
+      {
+         x=x - uCursor.x;
+         y=y - uCursor.y;
+         
+         float th=.20;
+         if(((x*x + y*y -th)*(x*x + y*y -th)*(x*x + y*y -th) - (x*x*y*y*y)) < 0.)
+         {
+               t=x+y+.3;
+               if(t<.2)
+                  t=.2;
+               t = .2 + t*.8 ;
+                if(t>.8)
+                  t=.8;
+               b=.1;
+               g=.1;
+         }
+         else
+         {
+            t=0.0;
+            g=0.0;
+            b=0.0;
+         }
+
+      }
+      y=y-.05;
+      x=x+.15;
+      if(x > -.8 && x<-.65 && y > .8 && y< .82)
+           {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       } 
+      if(x<-.715 && x>-.735 && y<.8 && y>.65)
+           {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       } 
+      if(x > -.8 && x<-.65 && y < .65 && y> .63)
+           {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       } 
+
+       x=x+.08;
+   //////////////////////// I done
+
+      if(x < -.40 && x > -.42 && y < .82 && y >.63)
+      {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       }    
+      if(x > -.40 && x<-.30 && y < .65 && y> .63)
+      {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       } 
+
+   ////////////////////// L done
+
+
+      if(x > -.25 && x < -.12 && y > .8 && y < .82)
+       {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       }
+      if(x > -.25 && x < -.12 && y > .63 && y < .65)
+         {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       }
+      if(x < -.23 && x > -.25 && y < .82 && y >.63)
+         {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       }
+      if(x < -.12 && x > -.14 && y < .82 && y >.63)
+         {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+         } 
+       ///////////////////////  O done
+
+      x=x-.01;
+      float x_t = -.01;
+      float y_t = .64;
+
+      if(abs((y-y_t) - 2.5*(x-x_t)) < .03 && y<.82 && y>.64)
+      {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+      }
+
+      if(abs((y-y_t) + 2.5*(x-x_t)) < .03 && y<.82 && y>.64)
+      {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+      }
+
+      x=x+.01;
+
+      /////////////////////////// v done
+
+      if(x>.12 && x<.14 && y>.64 && y<.82)
+      {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+      }
+
+      if(x>.14 && x<.23 && y<.82 && y>.80)
+      {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+      }
+
+      y = y + .075;
+
+      if(x>.14 && x<.23 && y<.82 && y>.80)
+      {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+      }
+
+      y= y + .085;
+
+      if(x>.14 && x<.23 && y<.82 && y>.80)
+      {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+      }
+
+      y = y - .085 - .075;
+
+      /////////////////////////////// E Done
+      x = x-.01;
+      if(x > .4 && x < .42 && y>.64 && y<.82)
+      {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+      }
+
+      if(x> .33 && x<.49 && y>.80 && y<.82)
+      {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+      }
+      //////////////////////////// T done
+      x = x + .02;
+      if(x>.54 && x < .56 && y>.64 && y<.82)
+      {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+      }
+
+      if(x>.65 && x < .67 && y>.64 && y<.82)
+      {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+      }
+
+      if(x>.56 && x<.65 && y>.72 && y<.74)
+      {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+      }
+      //////////////////////////// H done
+      x = x-1.5; 
+      if(x > -.79 && x<-.66 && y > .8 && y< .82)
+           {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       } 
+      if(x<-.715 && x>-.735 && y<.8 && y>.65)
+           {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       } 
+      if(x > -.79 && x<-.66 && y > .64 && y< .66)
+           {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       } 
+      x = x+1.5; 
+      //////////////////////////// I done
+
+      if(x>.90 && x < 1.02 && y>.8 && y<.82)
+         {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       } 
+
+
+      if(x>.90 && x < 1.02 && y>.71 && y<.73)
+         {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       } 
+
+
+      if(x>.90 && x < 1.02 && y>.64 && y<.66)
+         {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       } 
+
+       if(x>.90 && x<.92 && y<.8 && y>.73)
+          {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       } 
+
+       if(x>1.00 && x<1.02 && y<.71 && y>.66)
+          {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       } 
+
+       /////////////////////////////////// S done
+
+       ////////////////////////////// Class starts
+
+       x = x - .15;
+       //////////////////////////////Class starts
+       y = y+.15;
+       if(x>-0.4 && x<-.27 && y<-.6 && y>-.62)
+          {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       }          
+
+       if(x>-0.4 && x<-.27 && y<-.44 && y>-.46)
+      {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       }   
+
+       if(x> -.4 && x< -.38 && y>-.6 && y<-.46)
+       {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       }   
+       ////////////////////////////// C done
+       x = x + .02;
+       if(x>-.17 && x<-.15 && y>-.62 && y<-.44)
+         {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       }   
+
+       if(x>-.15 && x<-.05 && y>-.62 && y<-.60)
+         {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       }   
+
+       ////////////////////////// L Done      
+
+
+       if(x>.02 && x<.04 && y>-.62 && y<-.44) 
+         {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       }   
+
+       if(x>.14 && x<.16 && y>-.62 && y<-.44) 
+         {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       }   
+
+       if(x>.04 && x<.14 && y>-.55 && y<-.53)
+          {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       }   
+
+       if(x>.04 && x<.14 && y>-.46 && y<-.44)
+          {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       }   
+
+       ////////////////////////// A Done
+
+       if(x > .24 && x < .38 && y>-.46 && y<-.44)
+       {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+
+       }
+
+       y=y+.085;
+
+         if(x > .24 && x < .38 && y>-.46 && y<-.44)
+       {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+
+       }
+
+       y = y + .070;
+
+         if(x > .24 && x < .38 && y>-.46 && y<-.44)
+       {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+
+       }
+
+       y = y - .085 - .070;
+
+       if(x>.24 && x<.26 && y>-.53 && y<-.46)
+       {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       }
+
+      if(x>.36 && x<.38 && y<-.53 && y>-.6)
+       {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       }
+
+       /////////////////////////// S done
+
+       x = x - .2;
+
+        if(x > .24 && x < .38 && y>-.46 && y<-.44)
+       {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+
+       }
+
+       y=y+.085;
+
+         if(x > .24 && x < .38 && y>-.46 && y<-.44)
+       {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+
+       }
+
+       y = y + .070;
+
+         if(x > .24 && x < .38 && y>-.46 && y<-.44)
+       {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+
+       }
+
+       y = y - .085 - .070;
+
+       if(x>.24 && x<.26 && y>-.53 && y<-.46)
+       {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       }
+
+      if(x>.36 && x<.38 && y<-.53 && y>-.6)
+       {
+         t=abs(sin(7.*uTime+abs(x)+abs(y))) + .3;
+         g=abs(cos(3.*uTime+abs(x)+abs(y))) + .3;
+         b=abs(sin(5.*uTime+abs(x)+abs(y))) + .3;
+       }
+
+
+////////////////////////////////// S done
+
+
+
+       color = vec3(t, g, b);
+
+      gl_FragColor = vec4(color, 1.);
+   }
+</script>
+
+<script>
+start_gl('canvas1', document.getElementById('my_vertex_shader'  ).innerHTML,
+                    document.getElementById('my_fragment_shader').innerHTML);
+</script>
+

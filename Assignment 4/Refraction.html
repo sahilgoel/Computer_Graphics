@@ -1,0 +1,203 @@
+<script src=lib1.js></script>
+
+<body bgcolor=black>
+<center>
+<td><canvas id='canvas1' width=400 height=400></canvas></td>
+</center>
+</body>
+
+<script id='my_vertex_shader' type='x-shader/x-vertex'>
+   attribute vec3 aPosition;
+   varying   vec3 vPosition;
+   void main() {
+      gl_Position = vec4(aPosition, 1.0);
+      vPosition = aPosition;
+   }
+</script>
+
+<script id='my_fragment_shader' type='x-shader/x-fragment'>
+   precision mediump float;
+   uniform float uTime;
+   uniform vec3  uCursor;
+   varying vec3  vPosition;
+
+   vec4 sphere;
+   vec3 material;
+     vec4 sphere_n[2];
+     vec3 material_n[2];
+   vec3 Lrgb;
+   vec3 Ldir;
+
+   vec3 Lrgb2;
+   vec3 Ldir2;
+   
+   // Compute intersection of a ray with a sphere, if any.  Return t.
+   // If there is no intersection, return 10000.
+
+   float raySphere(vec3 V, vec3 W, vec4 S) {
+
+      // YOU NEED TO COMPUTE t, BY SETTING UP AND THEN SOLVING A QUADRATIC EQUATION.
+      float a = 1.;
+      vec3 temp = vec3(V.x-S.x, V.y - S.y, V.z - S.z);
+      float b = 2.*(dot (W, temp));
+      float c = dot(temp,temp) - S.w*S.w;
+      float d = b*b - 4.0 * a * c;
+      if(d < 0.0)
+         return 10000.;
+      else
+      {
+         float t1 = (-b + sqrt(d))/2.0*a;
+         float t2 = (-b - sqrt(d))/2.0*a;
+         if(t2>0.)
+            return t2;
+         else return t1;
+         return 10000.;
+      }
+   }
+
+    float rayPlane(vec3 V, vec3 W, vec4 P) {
+      vec3 normal = normalize(vec3(P.x, P.y, P.z));
+      float t = -(dot(V, normal) + P.w)/ dot(W,normal);
+      return t;
+   }
+
+   // Diffusely shade a sphere.
+   //    point is the x,y,z position of the surface point.
+   //    sphere is the x,y,z,r definition of the sphere.
+   //    material is the r,g,b color of the sphere.
+
+   vec3 shadeSphere(vec3 point, vec4 sphere, vec3 material) {
+      vec3 color = vec3(0.,0.,0.);
+   
+      vec3 normal = normalize(vec3((point.x - sphere.x),(point.y-sphere.y),(point.z-sphere.z))/sphere.w);
+      // YOU NEED TO COMPUTE COLOR FOR A DIFFUSELY SHADED SPHERE.
+      vec3 ambient = material / 5.;
+      vec3 diffuse = Lrgb2 / 3.;
+      vec3 srgb = vec3(.3,.3,.3) / 1.5;
+      
+      vec3 W = normalize(vec3(vPosition.x  , vPosition.y , -3.));
+      vec3 H = normalize(mix(Ldir,-W,.5));
+      
+      color = vec3(0.,0.,0.);
+      color =  ambient + Lrgb2 * (.2*diffuse*max(0.,dot(normal,Ldir)) + srgb*pow(max(0.,dot(normal, H)), 8.));
+
+      float ctheta1 = dot(-normalize(W),normalize(normal));
+      float stheta1 = sqrt(1. - ctheta1*ctheta1); 
+      float n1 = 1.;
+      float n2 = 1.5;
+      
+      vec3 Ns1 = cross(normalize(normal), normalize(W));
+      vec3 W_ref = (n1/n2*(cross(normalize(normal),-Ns1))) - normalize(normal)*sqrt(1. - ((n1*n1)/(n2*n2))*dot(Ns1,Ns1));
+      point += W_ref*.02;
+      float t_ref = raySphere(point, W_ref, sphere_n[0]);
+
+
+      
+      if(t_ref<10000. && t_ref >=0. && sphere.z == 0.0)
+      {
+         vec3 new_point = point + W_ref*t_ref;
+         normal = normalize(vec3((new_point.x - sphere.x),(new_point.y-sphere.y),(new_point.z-sphere.z))/sphere.w);
+         n1=1.5;
+         n2=1.;
+         Ns1 = cross(normalize(normal), normalize(W_ref));
+         vec3 W_ref = (n1/n2*(cross(normalize(normal),-Ns1))) - normalize(normal)*sqrt(1. - ((n1*n1)/(n2*n2))*dot(Ns1,Ns1));
+         new_point += W_ref*.02;
+         /*float t_final = -(dot(new_point, vec3(0,0,1))+.5) / dot(W_ref, vec3(0,0,1));
+         if(t_final <0.)
+         {
+            vec3 final_point = new_point + t_final*W_ref;
+            if(sin(3.*final_point.x)*sin(3.*final_point.y)>0.)
+               color = vec3(0.,0.,0.);
+            else
+               color = vec3(1.,1.,1.);
+         }*/
+         float t_final = raySphere(new_point, W_ref, sphere_n[1]);
+         
+         if(t_final>=0. && t_final<10000.)
+         {
+            vec3 final_point = new_point + t_final*W_ref;
+            vec3 normal = normalize(vec3((final_point.x - sphere_n[1].x),(final_point.y-sphere_n[1].y),(final_point.z-sphere_n[1].z))/sphere_n[1].w);
+            ambient = material_n[1]/5.;
+         H = normalize(mix(Ldir, W_ref, .5));
+         vec3 t_color =  1.*(ambient + Lrgb2 * (.2*diffuse*max(0.,dot(normal,Ldir)) + srgb*pow(max(0.,dot(normal, H)), 8.)));
+
+         color = t_color;
+         }
+
+
+      }
+
+      return color;
+   }
+
+   void main(void) {
+      vec2 c = uCursor.xy;
+
+
+      // YOU NEED TO COMPUTE V AND W TO CREATE THE RAY FOR THIS PIXEL,
+      // USING vPosition.x AND vPosition.y.
+
+      vec3 V, W;
+      vec4 sphere[2];
+      vec4 plane = vec4(0,1,0,-.3);
+      V = vec3(0.,0.,3.);
+      Lrgb = vec3(1.,.5,0.);
+      Ldir = normalize(vec3(c.x, c.y, 1. - 2. * dot(c, c)));
+      Ldir = normalize(vec3 (0.,0.2,.15));
+      Lrgb2 = vec3(1.,1.,1.);
+      Ldir2 = normalize(vec3(-c.x, c.y, 1. - 2. * dot(c,c)));
+      W = normalize(vec3(vPosition.x  , vPosition.y , -3.));
+
+      // YOU NEED TO SET x,y,z AND r FOR sphere.
+      //sphere[0] = vec4(.7 * cos(uTime),0.0,0.5*sin(1.*uTime-3.14),0.2);
+      //sphere[1] = vec4(0.,.7*cos(3.*uTime),.5*sin(uTime),0.2);
+
+      sphere[0] = vec4(0.0,0.0,0.0,0.4);
+      sphere[1] = vec4(.5*sin(.2*uTime)+0.2,.5*sin(.2*uTime)+0.2,-0.80,0.5);
+
+    
+      sphere_n[0]=sphere[0];
+      sphere_n[1]=sphere[1];
+      
+      // YOU NEED TO SET r,g,b FOR material.
+      vec3 material[2];
+      material[0] = vec3(.2*(25./255. - .05), .2*(25./255. - .05), .5*(112./255.- .1));
+      material[1] = vec3(.5*(112./255. - .1),.2*(25./255. - .05),.2*(25./255. - .5));
+      
+      material_n[0] = material[0];
+      material_n[1] = material[1];
+      vec3 color = vec3(0.,0.,0.);
+      
+      float t1 = raySphere(V, W, sphere[0]);    
+      float t2 = raySphere(V, W, sphere[1]);  
+      
+
+      if (t1 < 10000. && t2 >=10000.)
+      {
+         color = shadeSphere(V + t1 * W, sphere[0], material[0]);
+      }
+      else if(t1>=10000. && t2 < 10000.)
+      {
+         color = shadeSphere(V + t2*W, sphere[1], material[1]);
+      }
+      else if(t1<10000. && t2<10000.)
+      {
+         if(t1<t2)
+            color = shadeSphere(V + t1 * W, sphere[0], material[0]);
+         else
+            color = shadeSphere(V + t2*W, sphere[1], material[1]);
+      }
+
+      /*float t_pl = rayPlane(V, W, plane);
+      if(t_pl>=0. && t_pl<=10.0)
+         color = vec3(.5,.5,.5);*/
+
+      gl_FragColor = vec4(sqrt(color), 1.); // Do Gamma correction.
+   }
+</script>
+
+<script>
+start_gl('canvas1', document.getElementById('my_vertex_shader'  ).innerHTML,
+                    document.getElementById('my_fragment_shader').innerHTML);
+</script>
+

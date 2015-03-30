@@ -1,0 +1,244 @@
+<head>
+<script src=g.js></script>
+<script src=matrix4x4.js></script>
+<script src=lib1.js></script>
+
+</head>
+<body onload=g_start()>
+<canvas id=myCanvas1 width=640 height=640></canvas>
+
+<form name="myForm">
+
+<button style="position: absolute; top:170; left:700px" id="add_point" type="button" onclick="add_point1()">Add_point</button>
+<button style="position: absolute; top:130; left:700px" id="remove_point" type="button" onclick="remove_point1()">Remove_point</button>
+
+
+
+<p style="display:inline; position:absolute; left:700px ; top:200px">
+<br>
+1. Add a points then put it to desired position.
+<br>
+<br>
+2. Go to 1 as many times as you want.(minimum 4)
+</p>
+</form>
+
+<script>
+   var canvas = document.getElementById('myCanvas1');
+   var  w, h, g;
+   var delete_point = 0;
+   var index=-1;
+   var drag=0;
+   var linecurve = [];
+   var points = [];
+
+
+
+   function take_input()
+   {
+      var temp = document.forms["myForm"]["input1"].value;
+      var t = temp.split(",");
+      if(t.length>=2)
+         end_p = [parseFloat(t[0]),parseFloat(t[1])];
+
+      temp = document.forms["myForm"]["input2"].value;
+      t = temp.split(",");
+      if(t.length>=2)
+         start_p = [parseFloat(t[0]),parseFloat(t[1])];
+
+
+      temp = document.forms["myForm"]["input3"].value;
+      t = temp.split(",");
+      if(t.length>=2)
+         end_ang = [parseFloat(t[0]),parseFloat(t[1])];
+
+      temp = document.forms["myForm"]["input4"].value;
+      t = temp.split(",");
+      if(t.length>=2)
+         start_ang = [parseFloat(t[0]),parseFloat(t[1])];
+
+   }
+
+   function remove_point1()
+   {
+      alert("Click on the point you want to delete");
+      delete_point = 1;
+   }
+
+   function add_point1()
+   {
+      var t = [w/2, h/2];
+      points.push(t);
+   }
+
+   function drawCurve(C) {
+
+      g.beginPath();
+      g.strokeStyle = 'rgb(0,0,0)';
+      g.fillStyle = 'skyblue';
+      for (var i = 0 ; i < C.length ; i++)
+         if (i == 0)
+	        moveTo(C[i]);
+         else
+	        lineTo(C[i]);
+      lineTo(C[0]);
+      g.fill();
+   }
+
+   function viewport(p) {
+      return [ w/2 * p[0] + w/2, h/2 - p[1] * w/2 ];
+   }
+
+  
+
+   function moveTo(p) {
+      m = new Matrix4x4();
+      m.identity();
+      m.scale(2,0,0);
+      m.rotateX(Math.PI/9);
+      p = m.transform(p);
+      var xy = viewport(p);    // APPLY VIEWPORT TRANSFORM
+      g.moveTo(xy[0], xy[1]);
+   }
+
+   function lineTo(p) {
+      m = new Matrix4x4();
+      m.identity();
+      m.scale(3,0,0);
+      m.rotateX(Math.PI/9);
+      p = m.transform(p);
+      var xy = viewport(p);    // APPLY VIEWPORT TRANSFORM
+      g.lineTo(xy[0], xy[1]);
+   }
+
+
+   function mouse_down(e){
+         var x = e.pageX - this.offsetLeft;
+         var y = e.pageY - this.offsetTop;
+         drag = 1;
+         for(var i= 0 ; i < points.length ; i++)
+         {
+            if(Math.sqrt((points[i][0] - x)*(points[i][0] - x) + (points[i][1] - y)*(points[i][1] - y)) < 6)
+            {
+               index = i;
+               break;
+            }
+         }
+   }
+
+   function mouse_up(e) {
+      if(delete_point == 0)
+      {
+         var x = e.pageX - this.offsetLeft;
+         var y = e.pageY - this.offsetTop;
+         drag = 0;
+         if(index != -1)
+            {
+               points[index][0] = x;
+               points[index][1] = y;
+            }
+         index = -1;
+      }
+      else if(delete_point == 1 && index!=-1)
+      {
+         points.splice(index,1);  
+         delete_point = 0;
+         index = -1;
+      }
+   }
+
+   function mouse_move(e) {
+   var x = e.pageX - this.offsetLeft;
+   var y = e.pageY - this.offsetTop;
+   if(index != -1)
+      {
+         points[index][0] = x;
+         points[index][1] = y;
+      }
+   }
+
+
+
+   myCanvas1.animate = function(_g) {
+      g = _g;
+      w = g.canvas.width;
+      h = g.canvas.height;
+
+      if(points.length >= 4 )
+      {
+         var t = Math.abs((time%10)*.9999/10.00);
+         var a = [-1*points[0][0] + 3*points[1][0] - 3*points[2][0] + 1*points[3][0], -1*points[0][1] + 3*points[1][1] - 3*points[2][1] + 1*points[3][1]];
+   	   var b = [3*points[0][0] - 6*points[1][0] + 3*points[2][0] , 3*points[0][1] - 6*points[1][1] + 3*points[2][1] ];
+         var c = [-3*points[0][0] + 3*points[1][0], -3*points[0][1] + 3*points[1][1]];
+         var d = [points[0][0], points[0][1]];
+         var point_c= [a[0]*t*t*t + b[0]*t*t + c[0]*t + d[0], a[1]*t*t*t + b[1]*t*t + c[1]*t + d[1]];
+         linecurve = [];
+         for(var t=0.0;t<=1.0;t += 1/1000)
+         {
+            var point_c= [a[0]*t*t*t + b[0]*t*t + c[0]*t + d[0], a[1]*t*t*t + b[1]*t*t + c[1]*t + d[1]];
+            var cxx = point_c[0];
+            var cyy = point_c[1];
+            var temp_p = [cxx, cyy];
+            linecurve.push(temp_p);
+         }
+         g.strokeStyle = 'rgb(0,0,0)';
+         g.lineWidth = 2;
+         g.beginPath();
+         for(var i=0;i<linecurve.length;i++)
+         {
+            if(i==0)
+               {
+                  var p_t = (linecurve[i]);
+                  g.moveTo(p_t[0],p_t[1]);
+               }
+            else 
+               {
+                  var p_t = (linecurve[i]);
+                  g.lineTo(p_t[0],p_t[1]);
+               }
+         }
+         g.stroke();
+      }
+      for(var i=0;i<points.length;i++)
+      {
+         g.beginPath();
+         g.fillStyle ='rgb(200,100,225)';
+         g.arc(points[i][0],points[i][1], 6, 0, 2 * Math.PI);
+         g.fill();
+      }
+
+
+      g.beginPath();
+      g.lineWidth = 12;
+      g.moveTo(0,0);
+      g.lineTo(w,0);
+      g.lineTo(w,h);
+      g.lineTo(0,h);
+      g.lineTo(0,0);
+      g.stroke();
+
+
+   /*var t_p = viewport(start_p);
+   points.push(t_p);
+
+   var t_p = viewport(start_ang);
+   points.push(t_p);
+   
+   var t_p = viewport(end_ang);
+   points.push(t_p);
+   
+   var t_p = viewport(end_p);
+   points.push(t_p);*/
+
+
+
+      canvas.addEventListener('mousedown', mouse_down, false);
+      canvas.addEventListener('mouseup', mouse_up, false);
+      canvas.addEventListener('mousemove', mouse_move, false);   
+
+   }
+
+</script>
+</body>
+
+

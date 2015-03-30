@@ -1,0 +1,108 @@
+<head>
+<script src=g.js></script>
+<script src=matrix4x4.js></script>
+</head>
+<body onload=g_start()>
+<canvas id=myCanvas1 width=640 height=640></canvas>
+<script>
+   var w, h, g;
+
+   function drawCurve(C) {
+
+      g.beginPath();
+      g.strokeStyle = 'rgb(0,0,0)';
+      for (var i = 0 ; i < C.length ; i++)
+         if (i == 0)
+	        moveTo(C[i]);
+         else
+	        lineTo(C[i]);
+      lineTo(C[0]);
+      g.stroke();
+   }
+
+   function viewport(p) {
+      return [ w/2 * p[0] + w/2, h/2 - p[1] * w/2 ];
+   }
+
+   function moveTo(p) {
+      var xy = viewport(p);    // APPLY VIEWPORT TRANSFORM
+      g.moveTo(xy[0], xy[1]);
+   }
+
+   function lineTo(p) {
+      var xy = viewport(p);    // APPLY VIEWPORT TRANSFORM
+      g.lineTo(xy[0], xy[1]);
+   }
+
+
+   myCanvas1.animate = function(_g) {
+      g = _g;
+      w = g.canvas.width;
+      h = g.canvas.height;
+
+
+      g.fillStyle = 'rgb(100,190,155)';
+      g.beginPath();
+      g.moveTo(0, 0);
+      g.lineTo(w, 0);
+      g.lineTo(w, h);
+      g.lineTo(0, h);
+      g.lineTo(0, 0);
+      g.fill();
+
+
+      g.strokeStyle = 'rgb(0,0,0)';
+
+      var nu = 30.00 + Math.sin(time*.05)*10;
+      var nv = 10.00 + Math.abs(Math.cos(time*.05)*30) ;
+   
+
+
+      function uv2xyz(u, v) {
+         var phi = -Math.PI/2 + Math.PI * v; //-pi/2
+         var theta = 2 * Math.PI * u;  //0
+         var sign =[];
+         var x = Math.cos(phi)* Math.cos(theta);   
+         var y = Math.cos(phi)* Math.sin(theta);   
+         var z = Math.sin(phi);          
+
+         var p = 2;
+         var t = Math.abs(20*Math.sin(time*.1));
+         t = Math.floor(t);
+         if(t%2 == 0)
+            p = p + t;
+         var s = .5;
+         var a = Math.abs(Math.pow(Math.pow(x,p) + Math.pow(y,p) + Math.pow(z,p),1/p));
+         x = (x*s/a);
+         y = (y*s/a);
+         z = (z*s/a);
+	      return [ x, y, z];
+      }
+
+      var curve = [];
+      
+      for (var u = 0 ; u < 1 ; u += 1/nu) {
+         curve = [];
+         for (var v = 0 ; v < 1 ; v += 1/nv) {
+         
+         var p = uv2xyz(u,v);
+         curve.push(p);
+
+         p = uv2xyz(u+1/nu,v);
+         curve.push(p);
+         
+         p = uv2xyz(u+1/nu, v+1/nv);
+         curve.push(p);
+         
+         p = uv2xyz(u, v+1/nv);
+         curve.push(p);
+         
+         drawCurve(curve);
+         curve = [];  
+	  }
+   }
+   }
+
+</script>
+</body>
+

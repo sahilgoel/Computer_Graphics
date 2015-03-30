@@ -1,0 +1,101 @@
+<head>
+<script src=g.js></script>
+<script src=matrix4x4.js></script>
+</head>
+<body onload=g_start()>
+<canvas id=myCanvas1 width=640 height=640></canvas>
+<script>
+   var w, h, g;
+
+   function drawCurve(C) {
+      g.beginPath();
+      for (var i = 0 ; i < C.length ; i++)
+         if (i == 0)
+	        moveTo(C[i]);
+         else
+	        lineTo(C[i]);
+      lineTo(C[0]);
+      g.stroke();
+   }
+
+   function viewport(p) {
+      return [ w/2 * p[0] + w/2, h/2 - p[1] * w/2 ];
+   }
+
+   function moveTo(p) {
+      var xy = viewport(p);    // APPLY VIEWPORT TRANSFORM
+      g.moveTo(xy[0], xy[1]);
+   }
+
+   function lineTo(p) {
+      var xy = viewport(p);    // APPLY VIEWPORT TRANSFORM
+      g.lineTo(xy[0], xy[1]);
+   }
+
+
+   myCanvas1.animate = function(_g) {
+      g = _g;
+      w = g.canvas.width;
+      h = g.canvas.height;
+
+
+      g.fillStyle = 'rgb(100,140,155)';
+      g.beginPath();
+      g.moveTo(0, 0);
+      g.lineTo(w, 0);
+      g.lineTo(w, h);
+      g.lineTo(0, h);
+      g.lineTo(0, 0);
+      g.fill();
+
+
+      g.strokeStyle = 'rgb(0,0,0)';
+
+      var nu = 152;
+      var nv = 100 ;//+ Math.abs(50*Math.sin(.03*time));
+
+
+      function pointOnGlobe(u, v) {
+         var phi = -Math.PI/2 + Math.PI * v; //-pi/2
+         var theta = 2 * Math.PI * u;  //0
+         var sign =[];
+         var x = Math.cos(phi)* Math.cos(theta);   
+         var y = Math.cos(phi)* Math.sin(theta);   
+         var z = Math.sin(phi);          
+
+         if(x>=0)
+            sign[0] = 1; 
+         else
+            sign[0] = -1;
+         if(y>=0)
+            sign[1] = 1; 
+         else 
+            sign[1] = -1;
+         if(z>=0)
+            sign[2] = 1; 
+         else 
+            sign[2] = -1;
+
+
+         var p = 4;
+         var s = .5;
+         var a = Math.abs(Math.pow(Math.pow(x,p) + Math.pow(y,p) + Math.pow(z,p),1/p));
+         x = Math.abs(x*s/a) * sign[0];
+         y = Math.abs(y*s/a) * sign[1];
+         z = Math.abs(z*s/a) * sign[2];
+	      return [ x, y, z];
+      }
+
+      for (var v = 0 ; v <= 1 ; v += 1 / nv) {
+         var curve = [];
+         for (var u = 0 ; u <= 1 ; u += 1 / nu) {
+	    var p = pointOnGlobe(u, v);
+	    curve.push(p);
+	 }
+	 drawCurve(curve);
+      }
+   }
+
+</script>
+</body>
+

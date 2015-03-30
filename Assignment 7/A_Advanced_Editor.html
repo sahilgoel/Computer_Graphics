@@ -1,0 +1,290 @@
+<head>
+<script src=g.js></script>
+<script src=matrix4x4.js></script>
+<script src=lib1.js></script>
+
+</head>
+<body onload=g_start()>
+<canvas id=myCanvas1 width=640 height=640></canvas>
+
+<form name="myForm">
+
+<button style="position: absolute; top:120; left:700px" id="add_point" type="button" onclick="add_point1()">Add_point</button>
+<button style="position: absolute; top:100; left:700px" id="remove_point" type="button" onclick="remove_point1()">Remove_point</button>
+<button style="position: absolute; top:140; left:700px" id="display" type="button" onclick="display_points()">Hide/Show points</button>
+<button style="position: absolute; top:160; left:700px" id="add_set" type="button" onclick="add_s()">Add set of points</button>
+<button style="position: absolute; top:180; left:700px" id="fill" type="button" onclick="fill_curve()">Fill a closed curve</button>
+<label style="position: absolute; top:200; left:850px">COLOR(r,g,b) : Ex:- 100,200,50</label> <input style="position: absolute; top:200; left:700px;" type="text" name="set_color">
+<p style="display:inline; position:absolute; left:700px ; top:220px">First fill color values and then click fill a closed curve
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+Steps to use editor
+<br>
+1. First, click on add set of points.
+<br>
+2. Then click on add points(as many times as you want for that continuous curve).
+<br>
+3. If you want to create another curve, click on add set of points(it will start a new curve). Then go to 2.
+<br>
+4. Te remove a point, click on remove_point.
+<br>
+<br>
+<br>
+Add_point: It adds a new point to the latest curve.
+<br>
+Remove_point: Removes a specified point.
+<br>
+Hide/Show points: Hides or shows all the points.
+<br>
+Add set of points: Add e new curve(new points).
+<br>
+</p>
+</form>
+
+<script>
+   var canvas = document.getElementById('myCanvas1');
+   var  w, h, g;
+   var delete_point = 0;
+   var index=-1;
+   var set_index = -1;
+   var drag=0;
+   var linecurve = [];
+   var temp_color = [0,0,0];
+   var points = [];
+   var set_points = {points: [], fill_flag: 0, rgb: [0,0,0]}
+   var set = [];
+   var fill_flag =0 ;
+
+   var display_point = 1;
+   var prev_count = 0;
+   var changed = 0;
+
+   function binom(n, k) {
+    var coeff = 1;
+    for (var i = n-k+1; i <= n; i++) coeff *= i;
+    for (var i = 1;     i <= k; i++) coeff /= i;
+    return coeff;
+   }
+
+
+   function remove_point1()
+   {
+      alert("Click on the point you want to delete");
+      delete_point = 1;
+   }
+
+   function add_point1()
+   {
+      var t = [w/2, h/2];
+      var k = set.pop();
+      k.points.push(t);
+      set.push(k);
+   }
+
+   function add_s()
+   {
+      var set_points = {points: []}
+      set.push(set_points);
+   }
+
+
+   function display_points()
+   {
+      if(display_point == 0)
+         display_point = 1;
+      else 
+         display_point = 0;
+   }
+
+   function fill_curve()
+   {
+      var t = document.forms["myForm"]["set_color"].value;
+      temp_color = t.split(",");
+      alert("select any point on curve you want to fill");
+      fill_flag = 1;
+   }
+
+   
+
+
+   function drawCurve(C, ks) {
+
+      g.beginPath();
+      g.strokeStyle = 'rgb(0,0,0)';
+      if(set[ks].fill_flag==1)
+      {
+         g.fillStyle = 'rgb(' + set[ks].rgb[0] + ', ' + set[ks].rgb[1] + ', ' + set[ks].rgb[2] + ')';
+      }
+
+      g.lineWidth = 1;
+      for (var i = 0 ; i < C.length ; i++)
+         if (i == 0)
+	        moveTo(C[i]);
+         else
+	        lineTo(C[i]);      
+      if(set[ks].fill_flag==1)
+      {
+         g.fillStyle = 'rgb(' + set[ks].rgb[0] + ', ' + set[ks].rgb[1] + ', ' + set[ks].rgb[2] + ')';
+         g.fill();
+      }
+      else 
+         g.stroke();
+   }
+
+   function viewport(p) {
+      return [ w/2 * p[0] + w/2, h/2 - p[1] * w/2 ];
+   }
+
+   function moveTo(p) {
+      g.moveTo(p[0], p[1]);
+   }
+
+   function lineTo(p) {
+      g.lineTo(p[0], p[1]);
+   }
+
+
+   function mouse_down(e){
+         var x = e.pageX - this.offsetLeft;
+         var y = e.pageY - this.offsetTop;
+         drag = 1;
+         for(var k = 0; k < set.length ; k++)
+         {
+            var t = set[k];
+            for(var i= 0 ; i < t.points.length ; i++)
+            {
+               if(Math.sqrt((t.points[i][0] - x)*(t.points[i][0] - x) + (t.points[i][1] - y)*(t.points[i][1] - y)) < 6)
+               {
+                  index = i;
+                  set_index = k;
+                  break;
+               }
+            }
+         }
+   }
+
+   function mouse_up(e) {
+      if(delete_point == 0 && fill_flag==0)
+      {
+         var x = e.pageX - this.offsetLeft;
+         var y = e.pageY - this.offsetTop;
+         drag = 0;
+         if(index != -1)
+            {
+               set[set_index].points[index][0] = x;
+               set[set_index].points[index][1] = y;
+            }
+         index = -1;
+         set_index = -1;
+         changed = 1;
+      }
+      else if(delete_point == 1 && index!=-1 && fill_flag == 0)
+      {
+         set[set_index].points.splice(index,1);  
+         delete_point = 0;
+         index = -1;
+         set_index = -1;
+         changed = 1;
+      }
+      else if(fill_flag == 1)
+      {
+         set[set_index].fill_flag = 1;
+         set[set_index].rgb = temp_color;
+         index = -1;
+         set_index = -1;
+         changed = 1;
+         fill_flag = 0;
+      }
+   }
+
+   function mouse_move(e) {
+   var x = e.pageX - this.offsetLeft;
+   var y = e.pageY - this.offsetTop;
+   if(index != -1)
+      {
+         set[set_index].points[index][0] = x;
+         set[set_index].points[index][1] = y;
+      }
+   changed = 1;
+   }
+
+
+
+   myCanvas1.animate = function(_g) {
+      g = _g;
+      w = g.canvas.width;
+      h = g.canvas.height;
+      for(var ks=0;ks<set.length;ks++)
+      {
+         if(set[ks].points.length >= 2)
+         {
+            if(prev_count != set[ks].points.length || changed == 1)
+               {
+                  linecurve = [];
+                  for(var t=0.0;t<=1.0;t = t + 1/1000)
+                  {
+                     var n = set[ks].points.length - 1;
+                     var x = 0,
+                         y = 0;
+                     for(var k=0;k<=n;k++)
+                     {
+                        x += binom(n,k) * Math.pow(1.0-t, n-k) * Math.pow(t,k) * set[ks].points[k][0];
+                        y += binom(n,k) * Math.pow(1.0-t, n-k) * Math.pow(t,k) * set[ks].points[k][1];
+                     }
+                     linecurve.push([x,y]);
+                  }
+
+                  drawCurve(linecurve, ks);
+                  prev_count = points.length;
+                  changed = 0;
+               }
+            else 
+               drawCurve(linecurve, ks);
+
+         }
+      }
+
+
+
+      if(display_point)
+      {
+         for(var t = 0 ; t<set.length; t++)
+         {
+            var k = set[t];
+            for(var i=0;i<k.points.length;i++)
+            {
+               g.beginPath();
+               g.fillStyle ='rgb(200,100,225)';
+               g.arc(k.points[i][0],k.points[i][1], 6, 0, 2 * Math.PI);
+               g.fill();
+               g.font="25px Georgia";
+               g.fillText(i+1, k.points[i][0]-5, k.points[i][1]-15);
+            }
+         }
+      }
+
+
+      g.beginPath();
+      g.lineWidth = 12;
+      g.moveTo(0,0);
+      g.lineTo(w,0);
+      g.lineTo(w,h);
+      g.lineTo(0,h);
+      g.lineTo(0,0);
+      g.stroke();
+
+      canvas.addEventListener('mousedown', mouse_down, false);
+      canvas.addEventListener('mouseup', mouse_up, false);
+      canvas.addEventListener('mousemove', mouse_move, false);   
+
+   }
+
+</script>
+</body>
+
+

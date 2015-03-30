@@ -1,0 +1,247 @@
+<script src=lib1.js></script>
+
+<body bgcolor=black>
+<center>
+<td><canvas id='canvas1' width=400 height=400></canvas></td>
+</center>
+</body>
+
+<script id='my_vertex_shader' type='x-shader/x-vertex'>
+   attribute vec3 aPosition;
+   varying   vec3 vPosition;
+   void main() {
+      gl_Position = vec4(aPosition, 1.0);
+      vPosition = aPosition;
+   }
+</script>
+
+<script id='my_fragment_shader' type='x-shader/x-fragment'>
+   precision mediump float;
+   uniform float uTime;
+   uniform vec3  uCursor;
+   varying vec3  vPosition;
+
+   vec4 sphere;
+   vec3 material;
+
+   vec3 Lrgb;
+   vec3 Ldir;
+
+   vec3 Lrgb2;
+   vec3 Ldir2;
+   vec3 tS = vec3(0.,0.,0.);
+   /////////////////////////////////////////////////////////////////////////////// Noise
+   vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+	vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+	vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+	vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+	vec3 fade(vec3 t) { return t*t*t*(t*(t*6.0-15.0)+10.0); }
+
+	float noise(vec3 P) {
+	   vec3 i0 = mod289(floor(P)), i1 = mod289(i0 + vec3(1.0));
+	   vec3 f0 = fract(P), f1 = f0 - vec3(1.0), f = fade(f0);
+	   vec4 ix = vec4(i0.x, i1.x, i0.x, i1.x), iy = vec4(i0.yy, i1.yy);
+	   vec4 iz0 = i0.zzzz, iz1 = i1.zzzz;
+	   vec4 ixy = permute(permute(ix) + iy), ixy0 = permute(ixy + iz0), ixy1 = permute(ixy + iz1);
+	   vec4 gx0 = ixy0 * (1.0 / 7.0), gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;
+	   vec4 gx1 = ixy1 * (1.0 / 7.0), gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;
+	   gx0 = fract(gx0); gx1 = fract(gx1);
+	   vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0), sz0 = step(gz0, vec4(0.0));
+	   vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1), sz1 = step(gz1, vec4(0.0));
+	   gx0 -= sz0 * (step(0.0, gx0) - 0.5); gy0 -= sz0 * (step(0.0, gy0) - 0.5);
+	   gx1 -= sz1 * (step(0.0, gx1) - 0.5); gy1 -= sz1 * (step(0.0, gy1) - 0.5);
+	   vec3 g0 = vec3(gx0.x,gy0.x,gz0.x), g1 = vec3(gx0.y,gy0.y,gz0.y),
+	        g2 = vec3(gx0.z,gy0.z,gz0.z), g3 = vec3(gx0.w,gy0.w,gz0.w),
+	        g4 = vec3(gx1.x,gy1.x,gz1.x), g5 = vec3(gx1.y,gy1.y,gz1.y),
+	        g6 = vec3(gx1.z,gy1.z,gz1.z), g7 = vec3(gx1.w,gy1.w,gz1.w);
+	   vec4 norm0 = taylorInvSqrt(vec4(dot(g0,g0), dot(g2,g2), dot(g1,g1), dot(g3,g3)));
+	   vec4 norm1 = taylorInvSqrt(vec4(dot(g4,g4), dot(g6,g6), dot(g5,g5), dot(g7,g7)));
+	   g0 *= norm0.x; g2 *= norm0.y; g1 *= norm0.z; g3 *= norm0.w;
+	   g4 *= norm1.x; g6 *= norm1.y; g5 *= norm1.z; g7 *= norm1.w;
+	   vec4 nz = mix(vec4(dot(g0, vec3(f0.x, f0.y, f0.z)), dot(g1, vec3(f1.x, f0.y, f0.z)),
+	                      dot(g2, vec3(f0.x, f1.y, f0.z)), dot(g3, vec3(f1.x, f1.y, f0.z))),
+	                 vec4(dot(g4, vec3(f0.x, f0.y, f1.z)), dot(g5, vec3(f1.x, f0.y, f1.z)),
+	                      dot(g6, vec3(f0.x, f1.y, f1.z)), dot(g7, vec3(f1.x, f1.y, f1.z))), f.z);
+	   return 2.2 * mix(mix(nz.x,nz.z,f.y), mix(nz.y,nz.w,f.y), f.x);
+	}
+
+
+   //////////////////////////////////////////////////////////////////////////////
+   
+   // Compute intersection of a ray with a sphere, if any.  Return t.
+   // If there is no intersection, return 10000.
+
+   float raySphere(vec3 V, vec3 W, vec4 S) {
+
+      // YOU NEED TO COMPUTE t, BY SETTING UP AND THEN SOLVING A QUADRATIC EQUATION.
+      float a = 1.;
+      vec3 temp = vec3(V.x-S.x, V.y - S.y, V.z - S.z);
+      float b = 2.*(dot (W, temp));
+      float c = dot(temp,temp) - S.w*S.w;
+      float d = b*b - 4.0 * a * c;
+      if(d < 0.0)
+         return 10000.;
+      else
+      {
+         float t1 = (-b + sqrt(d))/2.0*a;
+         float t2 = (-b - sqrt(d))/2.0*a;
+         if(t2>0.)
+            return t2;
+         else return t1;
+         return 10000.;
+      }
+   }
+
+   void rayPlane(vec3 V, vec3 W, vec4 P)
+   {
+   	float a = P.x, b= P.y, c=P.z, d=P.w;
+   	float cond = a*W.x + b*W.y + c*W.z;
+   		if(cond < 0.)	// Ray entering half space
+   		{
+   			tS.x = -(a*V.x + b*V.y + c*V.z + d)/ (cond);
+   			tS.y = 10000.;
+   		}
+   		else if(cond > 0.)	//Ray exiting half space
+   		{
+   			tS.x = 0.;
+   			tS.y = -(a*V.x + b*V.y + c*V.z + d)/ (cond);
+   		}
+   		else		//Ray parallel to half space
+   		{
+   			if(a*V.x + b*V.y + c*V.z + d <= 0.)		//Ray inside half space
+	   		{
+	   			tS.x = 0.;
+	   			tS.y = 10000.;
+	   		}
+	   		else						//Ray outside half space
+	   		{
+	   			tS.x = 10000.;
+	   			tS.y = 10000.;
+	   		}
+   		}
+   }
+
+   // Diffusely shade a sphere.
+   //    point is the x,y,z position of the surface point.
+   //    sphere is the x,y,z,r definition of the sphere.
+   //    material is the r,g,b color of the sphere.
+
+   vec3 shadeSphere(vec3 point, vec4 sphere, vec3 material) {
+      vec3 color = vec3(0.,0.,0.);
+   
+      vec3 normal = normalize(vec3((point.x - sphere.x),(point.y-sphere.y),(point.z-sphere.z))/sphere.w);
+      // YOU NEED TO COMPUTE COLOR FOR A DIFFUSELY SHADED SPHERE.
+      vec3 ambient = material / 5.;
+
+      vec3 diffuse = Lrgb2 / 3.;
+      //diffuse = material / 5.;
+      vec3 srgb = vec3(.3,.3,.3) / 1.5;
+      float xn = point.x - sphere.x;
+      float yn = point.y - sphere.y;
+      float zn = point.z - sphere.z;
+      
+      vec3 W = normalize(vec3(vPosition.x  , vPosition.y , -3.));
+      vec3 H = normalize(mix(Ldir,-W,.5));
+      color = vec3(0.,0.,0.);
+      vec3 noisec;
+      noisec.x =  (max(0.,noise(vec3(100.*xn*yn+zn, (yn), (zn)))));
+      noisec.y =  (max(0.,noise(vec3((xn), (zn*yn), (zn)))));
+      noisec.z =  (max(0.,noise(vec3((xn), (yn), (xn*zn)))));
+
+      color =  noisec  + .3*ambient + Lrgb2 * (.2*diffuse*max(0.,dot(normal,Ldir)) + srgb*pow(max(0.,dot(normal, H)), 8.));
+      float x=point.x-sphere.x;
+      float y=point.y-sphere.y;
+      float z=point.z-sphere.z;
+    
+      return color;
+   }
+
+   void rayTube(vec3 V, vec3 W, vec3 T)
+   {
+      float a = W.x*W.x + W.z*W.z;
+      float b = 2. * (V.x*W.x + V.z*W.z);
+      float c = V.x*V.x + V.z*V.z - T.z*T.z;
+      float d = b*b - 4.*a*c;
+      if(d>=0.)
+      {
+         float first = (-b - abs(sqrt(d)))/2.*a;
+         float second = (-b + abs(sqrt(d)))/2.*a;
+         tS.x = min(first, second);
+         tS.y = max(first,second);
+      }
+      else
+      {
+         tS.x = 10000.;
+         tS.y = 10000.;
+      }
+   }
+
+   void main(void) {
+      vec2 c = uCursor.xy;
+
+
+      // YOU NEED TO COMPUTE V AND W TO CREATE THE RAY FOR THIS PIXEL,
+      // USING vPosition.x AND vPosition.y.
+
+      vec3 V, W;
+      vec3 color;
+      color = vec3(0.,0.,0.);
+      vec4 sphere[3];
+      V = vec3(0.,0.,3.);
+      vec3 Lrgb = vec3(1.,.5,0.);
+      vec3 Ldir = normalize(vec3(c.x, c.y, 1. - 2. * dot(c, c)));
+      W = (vec3(vPosition.x, vPosition.y, -3.));
+      vec4 plane[6];
+      plane[0] = vec4(1.,0.,0.,-.5);
+      plane[1] = vec4(-1.,0.,0.,-.5);
+
+      plane[2] = vec4(0.,0.,1.,-.5);
+      plane[3] = vec4(0.,0.,-1.,-.5);
+
+	  plane[4] = vec4(0.,1.,0.,-.5);
+      plane[5] = vec4(0.,-1.,0.,0.0);
+
+
+
+      rayPlane(V, W, plane[4]);
+      float t5in = tS.x;
+      float t5out = tS.y;
+      
+      rayPlane(V, W, plane[5]);
+      float t6in = tS.x;
+      float t6out = tS.y;
+
+ 
+
+      vec3 tube = vec3(0.,0.,.2); //cx, cz, r
+      rayTube(V, W, tube);
+
+      float t7in = tS.x;
+      float t7out = tS.y;
+
+      float tin = max(t5in, max(t6in, t7in));
+      float tout = min(t5out, min(t6out, t7out));
+
+
+      float tnin = max(t5in, t6in);
+      float tnout = min(t5out, t6out);
+
+      if(tnin<tnout && t7in<t7out &&  vPosition.y<.5 )
+      	{
+               color = .3 + vec3(abs(-vPosition.x),abs(-vPosition.x),abs(-vPosition.x));
+               //color = .3 + vec3(tin, tin, tin);
+         }
+      else
+      	color = vec3(0.,0.,0.);
+
+
+
+      gl_FragColor = vec4(sqrt(color), 1.); // Do Gamma correction.
+   }
+</script>
+
+<script>
+start_gl('canvas1', document.getElementById('my_vertex_shader'  ).innerHTML,
+                    document.getElementById('my_fragment_shader').innerHTML);
+</script>
+
